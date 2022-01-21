@@ -1,6 +1,7 @@
 require("dotenv").config(); // Necessário para as variáveis de ambiente
 const express = require("express");
 const { MongoClient, ObjectId } = require("mongodb");
+const { body, param, validationResult } = require('express-validator');
 const logger = require("morgan");
 // const dbConfig = require('./config/database.config.js'); // Banco de dados local
 
@@ -34,54 +35,100 @@ async function main() {
   // Operações CRUD
 
   //  [GET] - Buscar por ID
-  app.get("/herois/:id", async function (req, res) {
-    const id = req.params.id;
+  app.get("/herois/:id",
+    param('id').isMongoId(), // verifica se a string é uma representação de um MongoDB ObjectId 
 
-    try {
+    async (req, res) => {
+      const errors = validationResult(req);
+
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const id = req.params.id;
+
       await collection.findOne({ _id: new ObjectId(id) }, (err, result) => {
-        if (!err, result) {
+        if (!err && result) {
           res.send(result);
         } else {
-          res.send("Herói não encontrado.");
+          res.send("Ítem não encontrado.");
         }
       });
-    } catch (err) {
-      console.error(`Erro: ${err}`);
-      res.redirect("/")
     }
-
-  });
+  );
 
   // [POST] - Criar registro
-  app.post("/herois", async function (req, res) {
-    const item = req.body;
+  app.post("/herois",
+    body().isObject(), //valida se req.body é um object
 
-    await collection.insertOne(item);
+    async (req, res) => {
+      const errors = validationResult(req);
 
-    res.send(item);
-  });
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const item = req.body;
+
+      await collection.insertOne(item, (err, result) => {
+        if (!err && result) {
+          res.send(item);
+        } else {
+          res.send("Ítem não criado.");
+        }
+      });
+    }
+  );
 
   // [PUT] - Alterar registro
-  app.put("/herois/:id", async function (req, res) {
-    const id = req.params.id;
-    const item = req.body;
+  app.put("/herois/:id",
+    param("id").isMongoId(),
+    body().isObject(),
 
-    await collection.updateOne({ _id: new ObjectId(id) }, { $set: item });
+    async function (req, res) {
+      const errors = validationResult(req);
 
-    res.send(item);
-  });
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const id = req.params.id;
+      const item = req.body;
+
+      await collection.updateOne({ _id: new ObjectId(id) }, { $set: item }, (err, result) => {
+        if (!err && result.matchedCount) {
+          res.send(item);
+        } else {
+          res.send("Ítem não encontrado.");
+        }
+      });
+    }
+  );
 
   // [DELETE] - Deleta um item da lista
-  app.delete("/herois/:id", async function (req, res) {
-    const id = req.params.id;
-    const heroi = await collection.findOne({ _id: new ObjectId(id) });
+  app.delete("/herois/:id",
+    param("id").isMongoId(),
 
-    await collection.deleteOne({ _id: new ObjectId(id) });
+    async function (req, res) {
+      const errors = validationResult(req);
 
-    res.send(`Herói removido: ${heroi.nome}`);
-  });
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
 
-  app.listen(porta, () => `Server rodando na porta ${porta}.`);
+      const id = req.params.id;
+
+      await collection.deleteOne({ _id: new ObjectId(id) }, (err, result) => {
+        if (!err && result.deletedCount) {
+          res.send("Ítem excluido.");
+        } else {
+          res.send("Ítem não encontrado.");
+        }
+      });
+    }
+  );
+
+  app.listen(porta, () => `Servidor rodando na porta ${porta}.`);
 }
 
 main();
