@@ -16,6 +16,7 @@ app.use(express.json());
 async function main() {
   // Conexão Banco de Dados
   const client = await MongoClient.connect(url);
+  await client.connect();
   const db = client.db(dbName);
   const collection = db.collection("herois");
 
@@ -30,12 +31,25 @@ async function main() {
     res.send(documentos);
   });
 
+  // Operações CRUD
+
   //  [GET] - Buscar por ID
   app.get("/herois/:id", async function (req, res) {
     const id = req.params.id;
-    const item = await collection.findOne({ _id: new ObjectId(id) });
 
-    res.send(item);
+    try {
+      await collection.findOne({ _id: new ObjectId(id) }, (err, result) => {
+        if (!err, result) {
+          res.send(result);
+        } else {
+          res.send("Herói não encontrado.");
+        }
+      });
+    } catch (err) {
+      console.error(`Erro: ${err}`);
+      res.redirect("/")
+    }
+
   });
 
   // [POST] - Criar registro
@@ -60,10 +74,11 @@ async function main() {
   // [DELETE] - Deleta um item da lista
   app.delete("/herois/:id", async function (req, res) {
     const id = req.params.id;
+    const heroi = await collection.findOne({ _id: new ObjectId(id) });
 
     await collection.deleteOne({ _id: new ObjectId(id) });
 
-    res.send("Item removido.");
+    res.send(`Herói removido: ${heroi.nome}`);
   });
 
   app.listen(porta, () => `Server rodando na porta ${porta}.`);
