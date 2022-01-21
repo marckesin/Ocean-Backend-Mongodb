@@ -2,7 +2,6 @@ require("dotenv").config(); // Necessário para as variáveis de ambiente
 const express = require("express");
 const { MongoClient, ObjectId } = require("mongodb");
 const { body, param, validationResult } = require('express-validator');
-const logger = require("morgan");
 // const dbConfig = require('./config/database.config.js'); // Banco de dados local
 
 const porta = process.env.PORT || 3000;
@@ -11,7 +10,6 @@ const dbName = process.env.DBNAME;
 
 const app = express();
 
-app.use(logger("dev"));
 app.use(express.json());
 
 async function main() {
