@@ -1,7 +1,7 @@
 require("dotenv").config(); // Necessário para as variáveis de ambiente
 const express = require("express");
 const { MongoClient, ObjectId } = require("mongodb");
-const { body, param, validationResult } = require('express-validator');
+const { body, param, validationResult } = require("express-validator");
 // const dbConfig = require('./config/database.config.js'); // Banco de dados local
 
 const porta = process.env.PORT || 3000;
@@ -33,8 +33,9 @@ async function main() {
   // Operações CRUD
 
   //  [GET] - Buscar por ID
-  app.get("/herois/:id",
-    param('id').isMongoId(), // verifica se a string é uma representação de um MongoDB ObjectId 
+  app.get(
+    "/herois/:id",
+    param("id").isMongoId(), // verifica se a string é um MongoDB ObjectId
 
     async (req, res) => {
       const errors = validationResult(req);
@@ -52,11 +53,12 @@ async function main() {
           res.send("Ítem não encontrado.");
         }
       });
-    }
+    },
   );
 
   // [POST] - Criar registro
-  app.post("/herois",
+  app.post(
+    "/herois",
     body().isObject(), //valida se req.body é um object
 
     async (req, res) => {
@@ -75,11 +77,12 @@ async function main() {
           res.send("Ítem não criado.");
         }
       });
-    }
+    },
   );
 
   // [PUT] - Alterar registro
-  app.put("/herois/:id",
+  app.put(
+    "/herois/:id",
     param("id").isMongoId(),
     body().isObject(),
 
@@ -93,18 +96,23 @@ async function main() {
       const id = req.params.id;
       const item = req.body;
 
-      await collection.updateOne({ _id: new ObjectId(id) }, { $set: item }, (err, result) => {
-        if (!err && result.matchedCount) {
-          res.send(item);
-        } else {
-          res.send("Ítem não encontrado.");
-        }
-      });
-    }
+      await collection.updateOne(
+        { _id: new ObjectId(id) },
+        { $set: item },
+        (err, result) => {
+          if (!err && result.matchedCount) {
+            res.send(item);
+          } else {
+            res.send("Ítem não encontrado.");
+          }
+        },
+      );
+    },
   );
 
   // [DELETE] - Deleta um item da lista
-  app.delete("/herois/:id",
+  app.delete(
+    "/herois/:id",
     param("id").isMongoId(),
 
     async function (req, res) {
@@ -123,7 +131,7 @@ async function main() {
           res.send("Ítem não encontrado.");
         }
       });
-    }
+    },
   );
 
   app.listen(porta, () => `Servidor rodando na porta ${porta}.`);
