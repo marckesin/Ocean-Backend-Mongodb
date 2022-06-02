@@ -1,13 +1,17 @@
 {
   "name": "ocean-backend-mongodb",
   "version": "1.0.0",
-  "description": "",
+  "description": "Laboratório de backend (Nodejs/Express) e banco de dados com MongoDB e integração dos serviços de backend na nuvem com Mongodb Atlas e Deta Cloud.",
   "main": "index.js",
   "scripts": {
     "start": "node index",
     "devstart": "nodemon index"
   },
-  "keywords": [],
+  "keywords": [
+    "mongodb",
+    "nodejs",
+    "expressjs"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
