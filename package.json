@@ -10,7 +10,8 @@
   "keywords": [
     "mongodb",
     "nodejs",
-    "expressjs"
+    "expressjs",
+    "deta"
   ],
   "author": "",
   "license": "ISC",
