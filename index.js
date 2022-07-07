@@ -93,7 +93,7 @@ async function main() {
         return res.status(400).json({ errors: errors.array() });
       }
 
-      const id = req.params.id;
+      const { id } = req.params;
       const item = req.body;
 
       await collection.updateOne(
@@ -122,7 +122,7 @@ async function main() {
         return res.status(400).json({ errors: errors.array() });
       }
 
-      const id = req.params.id;
+      const { id } = req.params;
 
       await collection.deleteOne({ _id: new ObjectId(id) }, (err, result) => {
         if (!err && result.deletedCount) {
